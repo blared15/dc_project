@@ -4,6 +4,8 @@
 import time, os, requests,shutil
 import pandas as pd
 import concurrent.futures
+from datetime import datetime, timedelta
+import datetime
 columns = shutil.get_terminal_size().columns
 
 
@@ -104,6 +106,8 @@ def vm_check(dns):
     else:
         pass
 
+
+
 # %%
 title=(r"""
                          __  __                                              ____                                
@@ -174,7 +178,8 @@ print("Data count after merge: " + str(len(merg)))
 init_count = len(merg)
 time.sleep(2)
 
-
+#change last scanned date to_date
+merg['Last Scanned Date']=pd.to_datetime(merg['Last Scanned Date'], format= '%Y-%m-%d').dt.date
 # %%
 #Adding columns
 merg["IP in CMDB"]=""
@@ -203,11 +208,21 @@ while len(x) != 0 or len(y) !=0:
             dns_search(merg['DNS'][merg['DNS'].index==index].to_string(index=False).lstrip())
     x = merg[merg['IP in CMDB'].isnull()].index
     y = merg[merg['DNS in CMDB'].isnull()].index        
-# %%
-with pd.ExcelWriter('CMDB_Queried_Data_Latest_Test.xlsx') as writer:
-    merg.to_excel(writer, index=False)
 
-print("CMDB_Queried_Data_Latest_Test.xlsx has been exported")
+#older than 30days from last scanned date
+old = merg[merg['Last Scanned Date'] < datetime.date(2021,1,19)- pd.to_timedelta("30day") ].sort_values('Last Scanned Date' ,ascending=False)
+
+#30 days from last scanned date
+merg = merg[merg['Last Scanned Date'] > datetime.date(2021,1,19)- pd.to_timedelta("30day") ].sort_values('Last Scanned Date' ,ascending=False)
+
+# %%
+with pd.ExcelWriter('CMDB_Queried_Data_Latest.xlsx') as writer:
+    merg.to_excel(writer, index=False)
+    
+with pd.ExcelWriter('CMDB_Queried_Data_Latest_30_plus.xlsx') as writer:
+    old.to_excel(writer, index=False)
+
+print("CMDB_Queried_Data_Latest_Test.xlsx and CMDB_Queried_Data_Latest_30_plus.xlsx has been exported")
 stop = time.perf_counter()
 
 print("It took "+str(round((stop-start)/60,2))+" minutes for the script to complete")
