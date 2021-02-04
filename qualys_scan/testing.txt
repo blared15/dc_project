@@ -1,0 +1,5 @@
+Module 1 Serial: 2101XL607W matches in CMDB
+Module 1 Asset Tag: 4003077 matches in CMDB
+Module 1 Model Type:X7-2c Module matches in CMDB
+Module 1 Slot 1 matches in CMDB
+\b Module 1 SN: 2101XL607W/Parent SN:psn Doesn't match CMDB 
