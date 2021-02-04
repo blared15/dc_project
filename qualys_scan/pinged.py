@@ -42,7 +42,7 @@ def main_lookup(ip):
         response = os.popen("nslookup "+ ip+" | awk 'NR==6{print $4}'").read()
         response = response.rstrip()
         print(response)
-        data['CNAME'][data['IP']==ip]=response
+        data['CNAME'][data['IP']==ip]=response.rstrip('.')
     elif response == '\n':
         print(f"{ip} No DNS")
         data['CNAME'][data['IP']==ip]='None'
@@ -50,7 +50,7 @@ def main_lookup(ip):
         print(f"{ip} {response}")
         response = response.rstrip()
         print(response)
-        data['CNAME'][data['IP']==ip]=response
+        data['CNAME'][data['IP']==ip]=response.rstrip('.')
 
 def file_check(file_name):
     check = os.path.isfile(file_name)
@@ -93,6 +93,9 @@ while  len(y) !=0:
         main_ping(data['IP'][data['IP'].index==index].to_string(index=False).lstrip())
     y = data[data['Ping'].isnull()].index
 
+#DNS / CNAME Check
+data['DNS/CNAME Match']=""
+data['DNS/CNAME Match']= data['DNS']== data['CNAME']
 
 # %%
 with pd.ExcelWriter('latest_sample_pinged_data.xlsx') as writer:
